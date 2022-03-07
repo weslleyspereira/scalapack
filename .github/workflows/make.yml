@@ -3,7 +3,7 @@ name: Makefile CI
 on:
   push:
     paths-exclude:
-    - '.github/**'
+    - '.github/cmake.yml'
     - '.gitignore'
     - 'README'
     - '**README'
@@ -20,10 +20,6 @@ on:
     - 'CMAKE**'
     - '**CMakeLists.txt'
 
-env:
-  CFLAGS: "-Wall -pedantic"
-  FFLAGS: "-fimplicit-none -fcheck=all"
-
 defaults:
   run:
     shell: bash
@@ -32,16 +28,21 @@ jobs:
 
   build-all:
     runs-on: ubuntu-latest
+
     steps:
+
     - name: Checkout ScaLAPACK
       uses: actions/checkout@v2
+
     - name: Install MPI
       run: sudo apt install mpich
+
     - name: Build ScaLAPACK
       run: |
         cp SLmake.inc.example SLmake.inc
         make --silent -j4 lib
         make --silent all
+        
     - name: Run examples
       working-directory: ${{github.workspace}}/EXAMPLE
       run: |
