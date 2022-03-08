@@ -42,8 +42,8 @@ jobs:
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v3
 
-    - name: Install MPI
-      run: sudo apt install mpich
+    - name: Setup MPI
+      uses: mpi4py/setup-mpi@v1
         
     - name: CMake configuration
       run: >
