@@ -1,0 +1,67 @@
+name: CMake CI
+
+on:
+  push:
+    paths-exclude:
+    - '.github/make.yml'
+    - '.gitignore'
+    - 'README'
+    - '**README'
+    - 'LICENSE'
+    - '**Makefile'
+    - 'SLmake.inc.example'
+  pull_request:
+    paths-exclude:
+    - '.github/**'
+    - '.gitignore'
+    - 'README'
+    - '**README'
+    - 'LICENSE'
+    - 'CMAKE**'
+    - '**CMakeLists.txt'
+
+env:
+  CFLAGS: "-Wall -pedantic"
+  FFLAGS: "-fcheck=all"
+  BUILD_TYPE: Release
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  build-all:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout ScaLAPACK
+      uses: actions/checkout@v2
+
+    - name: Install MPI
+      run: sudo apt install mpich
+        
+    - name: CMake configuration
+      run: >
+        cmake -B build
+        -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/scalapack_install
+        -D BUILD_SHARED_LIBS=ON
+        -D BUILD_TESTING=ON
+        
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: |
+        ctest -D ExperimentalStart
+        ctest -D ExperimentalConfigure
+        ctest -D ExperimentalBuild -j4
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: |
+        ctest -D ExperimentalTest --schedule-random -j4 --output-on-failure
+        ctest -D ExperimentalSubmit
+        
+    - name: Install
+      run: cmake --build build --target install
