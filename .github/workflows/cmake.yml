@@ -55,13 +55,13 @@ jobs:
       run: |
         ctest -D ExperimentalStart
         ctest -D ExperimentalConfigure
-        ctest -D ExperimentalBuild -j4
+        ctest -D ExperimentalBuild -j
+        
+    - name: Install
+      run: cmake --build build --target install
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        ctest -D ExperimentalTest --schedule-random -j4 --output-on-failure
+        ctest -D ExperimentalTest --schedule-random -j --output-on-failure
         ctest -D ExperimentalSubmit
-        
-    - name: Install
-      run: cmake --build build --target install
