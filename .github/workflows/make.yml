@@ -12,7 +12,7 @@ on:
     - '**CMakeLists.txt'
   pull_request:
     paths-exclude:
-    - '.github/**'
+    - '.github/cmake.yml'
     - '.gitignore'
     - 'README'
     - '**README'

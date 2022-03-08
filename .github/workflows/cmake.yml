@@ -12,17 +12,17 @@ on:
     - 'SLmake.inc.example'
   pull_request:
     paths-exclude:
-    - '.github/**'
+    - '.github/make.yml'
     - '.gitignore'
     - 'README'
     - '**README'
     - 'LICENSE'
-    - 'CMAKE**'
-    - '**CMakeLists.txt'
+    - '**Makefile'
+    - 'SLmake.inc.example'
 
 env:
   CFLAGS: "-Wall -pedantic"
-  FFLAGS: "-fcheck=all"
+  FFLAGS: "-fcheck=all,no-bounds"
   BUILD_TYPE: Release
 
 defaults:
@@ -39,12 +39,16 @@ jobs:
     - name: Checkout ScaLAPACK
       uses: actions/checkout@v2
 
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
     - name: Install MPI
       run: sudo apt install mpich
         
     - name: CMake configuration
       run: >
         cmake -B build
+        -G Ninja
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/scalapack_install
         -D BUILD_SHARED_LIBS=ON
@@ -55,7 +59,7 @@ jobs:
       run: |
         ctest -D ExperimentalStart
         ctest -D ExperimentalConfigure
-        ctest -D ExperimentalBuild -j
+        ctest -D ExperimentalBuild
         
     - name: Install
       run: cmake --build build --target install
@@ -63,5 +67,5 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        ctest -D ExperimentalTest --schedule-random -j --output-on-failure
+        ctest -D ExperimentalTest --schedule-random --output-on-failure
         ctest -D ExperimentalSubmit
