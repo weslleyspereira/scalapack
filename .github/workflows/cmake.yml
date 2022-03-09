@@ -67,5 +67,5 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        ctest -D ExperimentalTest --schedule-random --output-on-failure
+        ctest -D ExperimentalTest --schedule-random --output-on-failure --timeout 1800
         ctest -D ExperimentalSubmit
