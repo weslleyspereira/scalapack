@@ -3,7 +3,7 @@ name: CMake CI
 on:
   push:
     paths-exclude:
-    - '.github/make.yml'
+    - '.github/workflows/make.yml'
     - '.gitignore'
     - 'README'
     - '**README'
@@ -12,7 +12,7 @@ on:
     - 'SLmake.inc.example'
   pull_request:
     paths-exclude:
-    - '.github/make.yml'
+    - '.github/workflows/make.yml'
     - '.gitignore'
     - 'README'
     - '**README'
