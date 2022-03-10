@@ -68,12 +68,12 @@ jobs:
         ctest -D ExperimentalStart
         ctest -D ExperimentalConfigure
         ctest -D ExperimentalBuild
-        
-    - name: Install
-      run: cmake --build build --target install
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        ctest -D ExperimentalTest --schedule-random --output-on-failure --timeout 1800
+        ctest -D ExperimentalTest --schedule-random --output-on-failure --timeout 180
         ctest -D ExperimentalSubmit
+        
+    - name: Install
+      run: cmake --build build --target install
