@@ -43,7 +43,10 @@ jobs:
       uses: seanmiddleditch/gha-setup-ninja@v3
 
     - name: Setup MPI
-      uses: mpi4py/setup-mpi@v1
+      # uses: mpi4py/setup-mpi@v1
+      run: |
+        sudo apt -y update
+        sudo apt -y install openmpi-bin libopenmpi-dev
 
     - name: Install BLAS and LAPACK
       run: sudo apt -y install libblas-dev liblapack-dev
