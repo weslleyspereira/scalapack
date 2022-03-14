@@ -33,7 +33,12 @@ defaults:
 jobs:
 
   build-all:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
 
     steps:
 
@@ -43,19 +48,42 @@ jobs:
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v3
 
-    - name: Setup MPI
+    - name: Setup MPI on Ubuntu
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       # uses: mpi4py/setup-mpi@v1
       run: |
         sudo apt -y update
         sudo apt -y install openmpi-bin libopenmpi-dev
 
-    - name: Install BLAS and LAPACK
-      run: sudo apt -y install libblas-dev liblapack-dev
+    - name: Setup MPI and gfortran on MacOS
+      if: ${{ matrix.os == 'macos-latest' }}
+      # uses: mpi4py/setup-mpi@v1
+      run: |
+        brew install open-mpi
+
+    - name: Setup MPI on Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      uses: mpi4py/setup-mpi@v1
+
+    # - name: Install BLAS and LAPACK
+    #   run: sudo apt -y install libblas-dev liblapack-dev
+
+    - name: Specific configurations for CMake on MacOS
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: >
+        cmake -B build -G Ninja
+        -DCMAKE_C_COMPILER="mpicc"
+        -DCMAKE_Fortran_COMPILER="mpifort"
+
+    - name: Specific configurations for CMake on Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: >
+        cmake -B build -G Ninja
+        -D MPI_BASE_DIR="$MSMPI_BIN"
         
     - name: CMake configuration
       run: >
-        cmake -B build
-        -G Ninja
+        cmake -B build -G Ninja
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -D CMAKE_INSTALL_PREFIX=${{github.workspace}}/scalapack_install
         -D BUILD_SHARED_LIBS=ON
